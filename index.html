@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Folder Scanner</title>
+        <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./assets/css/style.css">
+    </head>
+    <body ng-controller="MainController">
+
+        <header ng-include="'./views/navbar.html'"></header>
+
+        <div class="container-fluid" ng-include="'./views/content.html'"></div>
+
+        <footer ng-include="'./views/footer.html'"></footer>
+
+        <script src="./assets/js/helpers.js"></script>
+        <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="./node_modules/popper.js/dist/umd/popper.min.js"></script>
+        <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="./assets/js/angular.min.js"></script>
+        <script src="./node_modules/ngstorage/ngStorage.min.js"></script>
+        <script src="./assets/js/app.js"></script>
+        <script src="./assets/js/controllers/MainController.js"></script>
+        <script src="./renderer.js"></script>
+    </body>
+</html>

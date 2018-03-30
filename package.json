@@ -1,0 +1,55 @@
+{
+  "name": "FolderScanner",
+  "version": "1.0.0",
+  "productName": "FolderScanner",
+  "description": "An application that scans the chosen folder and parses any files inside with a given pattern.",
+  "main": "main.js",
+  "scripts": {
+    "start": "gulp serve",
+    "push": "git add . && git commit -m update && git push",
+    "build": "build"
+  },
+  "repository": "git@bitbucket.org:Ignatis/teoleme.git",
+  "keywords": [
+    "FolderScanner"
+  ],
+  "author": "Ignatios Drakoulas <ignatios@drakoulas.gr>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.7.12",
+    "electron-builder": "^20.0.6",
+    "electron-connect": "^0.6.3",
+    "gulp": "^3.9.1"
+  },
+  "dependencies": {
+    "bootstrap": "^4.0.0",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "ngstorage": "^0.3.11",
+    "popper.js": "^1.13.0"
+  },
+  "build": {
+    "appId": "FolderScanner",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": ["deb"]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icons/FolderScanner.ico"
+    }
+  }
+}
