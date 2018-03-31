@@ -37,14 +37,12 @@
                     </div>
                 </div>
             </div>
-            <div ng-show="results.ajaxLoading">
-                <img src="./assets/img/loader.gif">
-            </div>
         </div>
 
         <div class="text-center" ng-show="$storage.env.directory !== '' && results.state === 0">
-            <button href="#" class="btn btn-warning" ng-click="results.analyzeFolder()" ng-disabled="ajaxLoading">
+            <button href="#" class="btn btn-warning" ng-click="results.analyzeFolder()" ng-disabled="results.ajaxLoading">
                 <i class="fa fa-bar-chart"></i> Ανάλυση στοιχείων φακέλου
+                <i class="fa fa-spinner fa-spin" ng-show="results.ajaxLoading"></i>
             </button>
         </div>
 
@@ -56,8 +54,9 @@
                 <p>
                     Βρέθηκαν {{ results.files.length }} {{ results.files.length === 1 ? 'αρχείο' : 'αρχεία' }}.
                 </p>
-                <button class="btn btn-primary" ng-click="results.generateFile()">
+                <button class="btn btn-primary" ng-click="results.generateFile()" ng-disabled="results.ajaxLoading">
                     <i class="fa fa-save"></i> Εξαγωγή δεδομένων
+                    <i class="fa fa-spinner fa-spin" ng-show="results.ajaxLoading"></i>
                 </button>
             </div>
         </div>

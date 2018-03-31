@@ -4,9 +4,9 @@
 	.module("app")
 	.controller("MainController", MainController);
 
-	MainController.$inject = ["$scope", "$localStorage", "$q"];
+	MainController.$inject = ["$scope", "$localStorage", "$q", "$timeout"];
 
-	function MainController($scope, $localStorage, $q) {
+	function MainController($scope, $localStorage, $q, $timeout) {
 
 
 		const excel = require('node-excel-export');
@@ -65,20 +65,18 @@
             generateFile: function(){
 	            const parent = this;
 	            parent.ajaxLoading = true;
-
+	            const options = {
+		            title: "report.xlsx",
+		            defaultPath: "report.xlsx",
+	            };
+	            let filename = dialog.showSaveDialog(options);
+	            if(!filename){
+		            parent.ajaxLoading = false;
+		            return;
+	            }
 	            parent.createExcelFile()
 	            .then(function(report){
-		            const options = {
-			            title: "report.xlsx",
-			            defaultPath: "report.xlsx",
-		            };
-		            let filename = dialog.showSaveDialog(options);
-		            if(!filename){
-			            parent.ajaxLoading = false;
-			            return;
-		            }
 		            fs.writeFile(filename, report, (err) => {
-			            parent.ajaxLoading = false;
 			            if (err) {
 				            console.warn(err);
 				            $scope.$apply();
@@ -91,88 +89,10 @@
 		            });
 	            }).catch(function(err){
 	            	console.warn(err);
+	            }).then(function(){
+		            parent.ajaxLoading = false;
 	            });
             },
-	        getFileContents: function(path){
-	        	var defer = $q.defer();
-	        	if(!fs.existsSync(path)){
-	        		defer.resolve(false);
-		        }
-		        fs.readFile(path, (err, data) => {
-			        if (err){
-				        console.warn(err);
-				        return defer.resolve(false);
-			        }
-			        let results = {
-			        	date: "",
-				        number: "",
-				        sum: 0,
-				        quantity: 0,
-				        products: []
-			        };
-			        let lines = data.toString().split("\r\n");
-			        lines.splice(0, 9);
-			        lines.map(function(txt, index){
-			        	var line = txt.trim();
-			        	if(txt === ""){
-			        		return;
-				        }
-				        let sum = /^Σ Y N O Λ O:\s*EYPΩ\s?([0-9,]*)/.exec(line);
-				        if(sum && sum[1]){
-					        results.sum = sum[1];
-					        return;
-				        }
-				        let quantity = /^ΠOΣOTHTA\s*([0-9]*)/.exec(line);
-				        if(quantity && quantity[1]){
-					        results.quantity = quantity[1];
-					        return;
-				        }
-				        let number = /^AP\.ΔEΛT\.\s*([0-9\/]*)$/.exec(line);
-				        if(number && number[1]){
-					        results.number = number[1];
-					        let dateLine = lines[index + 1];
-					        if(dateLine){
-						        let date = /\w*\s*([0-9\-]{10}).*:([0-9]{2}:[0-9]{2})$/.exec(dateLine);
-						        if(date && date[1]){
-							        results.date = date[1] + " " + date[2];
-						        }
-					        }
-					        return;
-				        }
-				        let perispomeni = /~/.exec(line);
-				        if(perispomeni && perispomeni[1]){
-				        	return;
-				        }
-
-				        let metrita = /^MΕ?TPHTA\s*([0-9,]*)$/.exec(line);
-				        if(metrita && metrita[1]){
-					        return;
-				        }
-				        let mitroo = /^APIΘMOΣ MHTPΩOY.*/.exec(line);
-				        if(mitroo && mitroo[1]){
-					        return;
-				        }
-				        let product = /(.*)\s*([- ][0-9]+,[0-9]{2})\s*([0-9]{2},[0-9]{2})%$/.exec(line);
-				        if(product && product[1]){
-				        	let p = {};
-					        let previousLine = lines[index - 1];
-					        if(previousLine){
-						        let correct = /^ΔIOPΘΩΣH/.exec(previousLine.trim());
-						        if(correct && correct[0]){
-							        p.correction = true;
-						        }
-					        }
-					        p.name = product[1].trim();
-					        p.price = product[2].trim();
-					        p.vat = product[3].trim();
-					        results.products.push(p);
-					        return;
-				        }
-			        });
-			        return defer.resolve(results);
-		        });
-	        	return defer.promise;
-	        },
 	        createExcelFile: function(){
 		        var defer = $q.defer();
 	        	const parent = this;
@@ -208,6 +128,86 @@
 		        });
 		        return defer.promise;
 	        },
+	        getFileContents: function(path){
+		        var defer = $q.defer();
+		        if(!fs.existsSync(path)){
+			        defer.resolve(false);
+		        }
+		        fs.readFile(path, (err, data) => {
+			        if (err){
+				        console.warn(err);
+				        return defer.resolve(false);
+			        }
+			        let results = {
+				        date: "",
+				        number: "",
+				        sum: 0,
+				        quantity: 0,
+				        products: []
+			        };
+			        let lines = data.toString().split("\r\n");
+			        lines.splice(0, 9);
+			        lines.map(function(txt, index){
+				        var line = txt.trim();
+				        if(txt === ""){
+					        return;
+				        }
+				        let sum = /^Σ Y N O Λ O:\s*EYPΩ\s?([0-9,]*)/.exec(line);
+				        if(sum && sum[1]){
+					        results.sum = sum[1];
+					        return;
+				        }
+				        let quantity = /^ΠOΣOTHTA\s*([0-9]*)/.exec(line);
+				        if(quantity && quantity[1]){
+					        results.quantity = quantity[1];
+					        return;
+				        }
+				        let number = /^AP\.ΔEΛT\.\s*([0-9\/]*)$/.exec(line);
+				        if(number && number[1]){
+					        results.number = number[1];
+					        let dateLine = lines[index + 1];
+					        if(dateLine){
+						        let date = /\w*\s*([0-9\-]{10}).*:([0-9]{2}:[0-9]{2})$/.exec(dateLine);
+						        if(date && date[1]){
+							        results.date = date[1] + " " + date[2];
+						        }
+					        }
+					        return;
+				        }
+				        let perispomeni = /~/.exec(line);
+				        if(perispomeni && perispomeni[1]){
+					        return;
+				        }
+
+				        let metrita = /^MΕ?TPHTA\s*([0-9,]*)$/.exec(line);
+				        if(metrita && metrita[1]){
+					        return;
+				        }
+				        let mitroo = /^APIΘMOΣ MHTPΩOY.*/.exec(line);
+				        if(mitroo && mitroo[1]){
+					        return;
+				        }
+				        let product = /(.*)\s*([- ][0-9]+,[0-9]{2})\s*([0-9]{2},[0-9]{2})%$/.exec(line);
+				        if(product && product[1]){
+					        let p = {};
+					        let previousLine = lines[index - 1];
+					        if(previousLine){
+						        let correct = /^ΔIOPΘΩΣH/.exec(previousLine.trim());
+						        if(correct && correct[0]){
+							        p.correction = true;
+						        }
+					        }
+					        p.name = product[1].trim();
+					        p.price = product[2].trim();
+					        p.vat = product[3].trim();
+					        results.products.push(p);
+					        return;
+				        }
+			        });
+			        return defer.resolve(results);
+		        });
+		        return defer.promise;
+	        },
 	        processResults: function(products){
 	        	let dataset = [];
 				products.map(function(product, index){
@@ -215,8 +215,8 @@
 					dataset.push({
 						aa: index + 1,
 						name: product.name,
-						price: product.price,
-						vat: product.vat,
+						price: product.price.replace(",", "."),
+						vat: product.vat.replace(",", "."),
 						date: product.details.date,
 						number: product.details.number,
 						details: details,
@@ -233,6 +233,9 @@
 					        sz: 16,
 					        bold: true,
 					        underline: false
+				        },
+				        alignment: {
+				        	horizontal: "center"
 				        }
 			        },
 			        headers: {
@@ -246,13 +249,37 @@
 				        }
 			        },
 			        cell: {
-				        font: {
-					        color: {
-						        rgb: '000000'
+				        default:{
+					        font: {
+						        color: {
+							        rgb: '000000'
+						        },
+						        sz: 12,
+						        bold: false,
+						        underline: false
+					        }
+				        },
+				        float: {
+					        font: {
+						        color: {
+							        rgb: '000000'
+						        },
+						        sz: 12,
+						        bold: false,
+						        underline: false
 					        },
-					        sz: 12,
-					        bold: false,
-					        underline: false
+					        numFmt: "0.00"
+				        },
+				        percentage: {
+					        font: {
+						        color: {
+							        rgb: '000000'
+						        },
+						        sz: 12,
+						        bold: false,
+						        underline: false
+					        },
+					        numFmt: "0.00%"
 				        }
 			        }
 		        };
@@ -269,43 +296,43 @@
 			        aa: { // <- the key should match the actual data key
 				        displayName: 'Α/Α', // <- Here you specify the column header
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '5' // <- width in pixels
 			        },
 			        name: {
 				        displayName: 'Όνομα προϊόντος',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '34' // <- width in chars (when the number is passed as string)
 			        },
 			        price: {
 				        displayName: 'Τιμή',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.float, // <- Cell style
 				        width: '10' // <- width in pixels
 			        },
 			        vat: {
 				        displayName: 'Φ.Π.Α',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.percentage, // <- Cell style
 				        width: '8' // <- width in pixels
 			        },
 			        date: {
 				        displayName: 'Ημερομηνία',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '16' // <- width in pixels
 			        },
 			        number: {
 				        displayName: 'Αριθμός απόδειξης',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '20' // <- width in pixels
 			        },
 			        details: {
 				        displayName: 'Λεπτομέριες',
 				        headerStyle: styles.headers,
-				        cellStyle: styles.cell, // <- Cell style
+				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '34' // <- width in pixels
 			        }
 		        };

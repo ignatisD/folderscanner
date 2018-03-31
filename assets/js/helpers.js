@@ -2,7 +2,7 @@ if(typeof module === 'object'){
     window.module = module;
     module = undefined;
 }
-require('electron-connect').client.create();
+// require('electron-connect').client.create();
 
 const { exec, spawn } = require('child_process');
 const { shell } = require('electron');
