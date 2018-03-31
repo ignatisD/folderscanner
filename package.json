@@ -26,6 +26,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "ngstorage": "^0.3.11",
+    "node-excel-export": "^1.4.3",
     "popper.js": "^1.13.0"
   },
   "build": {
@@ -45,7 +46,9 @@
       ]
     },
     "linux": {
-      "target": ["deb"]
+      "target": [
+        "deb"
+      ]
     },
     "win": {
       "target": "squirrel",

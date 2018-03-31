@@ -1,1 +1,74 @@
-Hello World
+<div class="card m-auto">
+    <div class="card-body">
+        <h5 class="card-title">Επιλογή φακέλου</h5>
+        <!--<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>-->
+        <div class="card-text">
+            <div class="form-group row">
+                <label for="directory" class="col-sm-3 col-form-label col-form-label-sm text-nowrap">
+                    <i class="fa fa-folder"></i>
+                    Φάκελος
+                </label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input
+                                type="text"
+                                class="form-control form-control-sm select"
+                                value="{{ $storage.env.directory }}"
+                                disabled
+                        />
+                        <input
+                                type="file"
+                                hidden
+                                ng-dir="$storage.env.directory"
+                                id="directory"
+                        />
+                        <div class="input-group-append">
+                            <button
+                                    class="btn btn-primary btn-sm"
+                                    type="button"
+                                    onclick="$('#directory').trigger('click')"
+                            >
+                                <i class="fa fa-folder"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" type="button" ng-click="results.clearFolder()">
+                                <i class="fa fa-remove"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="results.ajaxLoading">
+                <img src="./assets/img/loader.gif">
+            </div>
+        </div>
+
+        <div class="text-center" ng-show="$storage.env.directory !== '' && results.state === 0">
+            <button href="#" class="btn btn-warning" ng-click="results.analyzeFolder()" ng-disabled="ajaxLoading">
+                <i class="fa fa-bar-chart"></i> Ανάλυση στοιχείων φακέλου
+            </button>
+        </div>
+
+        <div class="text-center" ng-show="$storage.env.directory !== '' && results.state === 1">
+            <p ng-show="!results.files.length">
+                Δεν βρέθηκαν συμβατά αρχεία.
+            </p>
+            <div ng-show="results.files.length">
+                <p>
+                    Βρέθηκαν {{ results.files.length }} {{ results.files.length === 1 ? 'αρχείο' : 'αρχεία' }}.
+                </p>
+                <button class="btn btn-primary" ng-click="results.generateFile()">
+                    <i class="fa fa-save"></i> Εξαγωγή δεδομένων
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center" ng-show="$storage.env.directory !== '' && results.state === 2">
+            <button class="btn btn-success" ng-click="results.openFile()">
+                <i class="fa fa-file-excel-o"></i> Άνοιγμα αρχείου
+            </button>
+            <button class="btn btn-danger" ng-show="results.state === 2" ng-click="results.reset()">
+                <i class="fa fa-trash"></i> Καθαρισμός
+            </button>
+        </div>
+    </div>
+</div>
