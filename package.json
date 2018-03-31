@@ -9,7 +9,7 @@
     "push": "git add . && git commit -m update && git push",
     "build": "build"
   },
-  "repository": "git@bitbucket.org:Ignatis/teoleme.git",
+  "repository": "https://github.com/ignatisD/folderscanner.git",
   "keywords": [
     "FolderScanner"
   ],
