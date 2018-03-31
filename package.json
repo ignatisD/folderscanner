@@ -1,6 +1,6 @@
 {
   "name": "FolderScanner",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "productName": "FolderScanner",
   "description": "An application that scans the chosen folder and parses any files inside with a given pattern.",
   "main": "main.js",
@@ -23,8 +23,10 @@
   },
   "dependencies": {
     "bootstrap": "^4.0.0",
+    "encoding": "^0.1.12",
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
+    "jschardet": "^1.6.0",
     "ngstorage": "^0.3.11",
     "node-excel-export": "^1.4.3",
     "popper.js": "^1.13.0"

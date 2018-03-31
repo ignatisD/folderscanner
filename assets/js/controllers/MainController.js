@@ -128,7 +128,16 @@
 		        });
 		        return defer.promise;
 	        },
+	        fixEncoding: function(buffer){
+		        let charset = jschardet.detect(buffer);
+		        let resultBuffer = buffer;
+		        if(charset.encoding !== "UTF-8"){
+			        resultBuffer = encoding.convert(buffer, "UTF-8", "ISO-8859-7");
+		        }
+		        return resultBuffer.toString();
+	        },
 	        getFileContents: function(path){
+	        	let parent = this;
 		        var defer = $q.defer();
 		        if(!fs.existsSync(path)){
 			        defer.resolve(false);
@@ -145,9 +154,11 @@
 				        quantity: 0,
 				        products: []
 			        };
-			        let lines = data.toString().split("\r\n");
+			        let resultBuffer = parent.fixEncoding(data);
+			        let lines = resultBuffer.split("\r\n");
 			        lines.splice(0, 9);
 			        lines.map(function(txt, index){
+				        // var line = txt.trim();
 				        var line = txt.trim();
 				        if(txt === ""){
 					        return;
@@ -159,7 +170,7 @@
 				        }
 				        let quantity = /^ΠOΣOTHTA\s*([0-9]*)/.exec(line);
 				        if(quantity && quantity[1]){
-					        results.quantity = quantity[1];
+					        results.quantity = parseInt(quantity[1]);
 					        return;
 				        }
 				        let number = /^AP\.ΔEΛT\.\s*([0-9\/]*)$/.exec(line);
@@ -330,7 +341,7 @@
 				        width: '20' // <- width in pixels
 			        },
 			        details: {
-				        displayName: 'Λεπτομέριες',
+				        displayName: 'Λεπτομέρειες',
 				        headerStyle: styles.headers,
 				        cellStyle: styles.cell.default, // <- Cell style
 				        width: '34' // <- width in pixels
